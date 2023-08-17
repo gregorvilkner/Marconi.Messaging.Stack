@@ -7,9 +7,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServicesBus", "ServicesBus"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KeyVault", "KeyVault", "{5D0E11B1-C043-444D-B9B3-E4CE836E098F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloKeyvault", "HelloKeyvault\HelloKeyvault.csproj", "{60B3922C-8FF9-4C4C-849D-98213967E49E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloServiceBus", "HelloServiceBus\HelloServiceBus.csproj", "{50C8768B-DCD9-477A-9416-7CB7AC745523}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60B3922C-8FF9-4C4C-849D-98213967E49E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B3922C-8FF9-4C4C-849D-98213967E49E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B3922C-8FF9-4C4C-849D-98213967E49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B3922C-8FF9-4C4C-849D-98213967E49E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50C8768B-DCD9-477A-9416-7CB7AC745523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50C8768B-DCD9-477A-9416-7CB7AC745523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50C8768B-DCD9-477A-9416-7CB7AC745523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50C8768B-DCD9-477A-9416-7CB7AC745523}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{60B3922C-8FF9-4C4C-849D-98213967E49E} = {5D0E11B1-C043-444D-B9B3-E4CE836E098F}
+		{50C8768B-DCD9-477A-9416-7CB7AC745523} = {40D4396D-247D-403E-B098-ABAA21A32793}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B2F30A4-F211-4B8A-8791-C4FDAD4F3075}

@@ -1,6 +1,5 @@
-﻿using Microsoft.Azure.Management.Fluent;
-using Microsoft.Azure.Management.ServiceBus.Fluent;
-using Microsoft.Azure.ServiceBus.Management;
+﻿using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using System;
 using System.Linq;
 
@@ -12,23 +11,27 @@ namespace HelloServiceBus
         {
             Console.WriteLine("Hello World!");
 
-            string serviceBusConnectionString = "Endpoint=sb://marconirelay.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=0Sj+R0v7xdUiqVPavaVymH0igrrsq9gd7+ASbE7pTn4=";
+            var queueName = "testqueue";
 
-            var managementClient = new ManagementClient(serviceBusConnectionString);
+            var serviceBusConnectionString_ = ConfigurationRoot.Get().GetSection("ServiceBus_").GetSection("ConnectionString").Value;
+            var serviceBusConnectionString = ConfigurationRoot.Get().GetSection("ServiceBus").GetSection("ConnectionString").Value;
 
-            var allQueues = await managementClient.GetQueuesAsync();
+            //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/samples/Sample00_AuthenticateClient.md
+            var MessagingClient = new ServiceBusClient(serviceBusConnectionString);
 
-            if(allQueues.Where(x=>x.Path=="testqueue").Count() > 0)
+            //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/samples/Sample07_CrudOperations.md
+            var AdminClient = new ServiceBusAdministrationClient(serviceBusConnectionString);
+            var allQueues = AdminClient.GetQueuesAsync();
+            await foreach (var item in allQueues)
             {
-                // delete the existing test queue
-                await managementClient.DeleteQueueAsync("testqueue");
+                Console.WriteLine(item.Name);
+                if (item.Name == queueName)
+                {
+                    await AdminClient.DeleteQueueAsync(item.Name);
+                }
             }
 
-            var newQueue = await managementClient.CreateQueueAsync("testqueue");
-
-            allQueues = await managementClient.GetQueuesAsync();
-
-
+            var newQueue = await AdminClient.CreateQueueAsync(queueName);
 
         }
     }

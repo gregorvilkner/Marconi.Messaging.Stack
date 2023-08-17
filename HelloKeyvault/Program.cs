@@ -20,6 +20,7 @@ namespace HelloKeyvault
             string keyVaultName = "MarconiKeyVaultClient";
             var kvUri = "https://" + keyVaultName + ".vault.azure.net";
 
+            //https://stackoverflow.com/a/63100509
             var client = new SecretClient(new Uri(kvUri), new ClientSecretCredential(TenantId, ClientId, ClientSecret));
 
             var setNewSecret = await client.SetSecretAsync("newSecret", Guid.NewGuid().ToString());

@@ -50,6 +50,9 @@ else
 @code {
     private WeatherForecast[]? forecasts;
 
+    // https://codyanhorn.tech/blog/blazor/2020/09/05/Blazor-Get-Access-Token-for-User.html
+    // just to have the method to obtain an access token
+
     public string AccessToken { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -57,6 +60,7 @@ else
         try
         {
             forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+
 
             var accessTokenResult = await TokenProvider.RequestAccessToken();
             AccessToken = string.Empty;

@@ -17,10 +17,12 @@ namespace HelloServiceBus
             var serviceBusConnectionString = ConfigurationRoot.Get().GetSection("ServiceBus").GetSection("ConnectionString").Value;
 
             //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/samples/Sample00_AuthenticateClient.md
-            var MessagingClient = new ServiceBusClient(serviceBusConnectionString);
+            await using var MessagingClient = new ServiceBusClient(serviceBusConnectionString);
+
 
             //https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/samples/Sample07_CrudOperations.md
             var AdminClient = new ServiceBusAdministrationClient(serviceBusConnectionString);
+
             var allQueues = AdminClient.GetQueuesAsync();
             await foreach (var item in allQueues)
             {
@@ -32,6 +34,7 @@ namespace HelloServiceBus
             }
 
             var newQueue = await AdminClient.CreateQueueAsync(queueName);
+
 
         }
     }

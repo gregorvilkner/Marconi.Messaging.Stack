@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServicesBus", "ServicesBus"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KeyVault", "KeyVault", "{5D0E11B1-C043-444D-B9B3-E4CE836E098F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloKeyvault", "HelloKeyvault\HelloKeyvault.csproj", "{60B3922C-8FF9-4C4C-849D-98213967E49E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloKeyVault", "HelloKeyvault\HelloKeyVault.csproj", "{60B3922C-8FF9-4C4C-849D-98213967E49E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloServiceBus", "HelloServiceBus\HelloServiceBus.csproj", "{50C8768B-DCD9-477A-9416-7CB7AC745523}"
 EndProject

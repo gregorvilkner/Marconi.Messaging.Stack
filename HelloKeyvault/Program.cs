@@ -5,7 +5,7 @@ using Microsoft.Identity.Client;
 using System;
 using System.Linq;
 
-namespace HelloKeyvault
+namespace HelloKeyVault
 {
     class Program
     {
@@ -17,15 +17,15 @@ namespace HelloKeyvault
             string ClientSecret = ConfigurationRoot.Get().GetSection("KeyVault").GetSection("ClientSecret").Value;
             string ClientId = ConfigurationRoot.Get().GetSection("KeyVault").GetSection("ClientId").Value;
 
-            string keyVaultName = "MarconiKeyVaultClient";
+            string keyVaultName = "MarconiRelayKeyVault";
             var kvUri = "https://" + keyVaultName + ".vault.azure.net";
 
             //https://stackoverflow.com/a/63100509
             var client = new SecretClient(new Uri(kvUri), new ClientSecretCredential(TenantId, ClientId, ClientSecret));
 
-            var setNewSecret = await client.SetSecretAsync("newSecret", Guid.NewGuid().ToString());
-            var getNewSecret = await client.GetSecretAsync("newSecret");
-
+            //var setNewSecret = await client.SetSecretAsync("newSecret", Guid.NewGuid().ToString());
+            //var getNewSecret = await client.GetSecretAsync("newSecret");
+             
             var getNewSecretVersionProperties = client.GetPropertiesOfSecretVersions("newSecret");
             foreach (var aSecretVersionProperty in getNewSecretVersionProperties)
             {

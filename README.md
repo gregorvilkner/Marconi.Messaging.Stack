@@ -28,10 +28,47 @@ We use Azure Service Bus to relay messages between local resources and public Gr
 
 ## Marconi Relay Blazor Web Application
 
-- we are using this walkthrough to create a blazor b2c secured wasm web application: https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/hosted-with-azure-active-directory-b2c?view=aspnetcore-7.0
+### First to get a B2C Secured Blazor WASM App Going
+
+We are using this walkthrough to create a Blazor B2C secured wasm web application: https://learn.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/hosted-with-azure-active-directory-b2c?view=aspnetcore-7.0
+
+The reason we chose WASM is because it combines a web api and a front end in the same project. The purpose of the Marconi Relay is basically to be an API to control queues in our Service Bus, but having a front end will allow us to build reports and facilitate simple testing.
 
 1. register api (Marconi.Relay.WebAPI)
 1. register client (Marconi.Relay.WebClient)
 1. expose api by adding scope on the server
 1. select that scope in api permissions on the client
 1. create massive cli command to create application
+
+```
+dotnet new blazorwasm -au IndividualB2C --aad-b2c-instance "https://MarconiStack.b2clogin.com/" --api-client-id "75a3bd6b-14f0-4fe5-970a-9d3fb15991a7" --app-id-uri "75a3bd6b-14f0-4fe5-970a-9d3fb15991a7" --client-id "a26d2087-7db1-4c17-b821-f007f9f015a1" --default-scope "queue.manage" --domain "MarconiStack.onmicrosoft.com" -ho -o MarconiRelay -ssp "B2C_1_SignUpAndSignIn"
+```
+### Then to Add the Queue Mangement
+
+We add a MarconiNrController to the web api. The methods available on the controller include:
+
+- \[Authorize, Get, "MarconiNr"\] GetActiveMarconiNumbers() - gets a listing of the available currently active Marconi Numbers for the authenticated user.
+
+- \[Get, "MarconiNr/{MarconiNr}"\] ValidateMarconiNumber(string MarconiNr) - validates a Marconi Number. If the number is good the method returns a "chitChatKey", which is a connection string that can be used to post messages to the ServiceBus Queue. The "chitChatKey" can only post and listen.
+
+- \[Authorize, Put, "MarconiNr"\] Put() - Creates and returns a new Marconi Number.
+
+- \[Authorize, Delete, "MarconiNr/{MarconiNr}"] Delete(string MarconiNr) - Deletes a Marconi Number, i.e. deletes the corresponding queue from our Service Bus.
+
+```
+We should probably add Swagger...
+```
+
+The MarconiNrController requires access to the Key Vault, which is where we store connection strings for our service bus. We configure a service to obtain the required parameters from our configuration in the Program.cs file.
+
+The following helper classes are added to the shared project:
+
+- MarconiNrMaker.cs - can make random phone numbers
+- MarconiKeyVaultClient.cs - the contract to serialize a ClientId, ClientSecret, and TenantId
+- RelayHelper.cs - a number of methods to create, delete and vaidate Marconi Numbers, i.e. manage queues in our service bus.
+
+We add 2 secrets to our key vault:
+
+1. queueManager - a service bus connection string that can manage queues. We can simply utilize the RootManageSharedAccessKey we used earlier to test the service bus. This secret is only available to the web api.
+2. chitChatKey - a service bus connection string that only allows to post and receive messages. We create a SendAndListenSharedAccessKey for this. This secret is returned when a Marconi Number is successfully validated. Messaging participants include a localized resource (server), where a queue is created and requests are answered, as well as a client, which posts requests. 
+

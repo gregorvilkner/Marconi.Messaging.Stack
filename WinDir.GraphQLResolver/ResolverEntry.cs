@@ -1,5 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Instrumentation;
+using GraphQL.Transport;
 using WinDir.GraphQLResolver.GraphQL;
 
 namespace WinDir.GraphQLResolver
@@ -12,26 +13,23 @@ namespace WinDir.GraphQLResolver
 
         }
 
-        public async Task<ExecutionResult> GetResultAsync(GraphQLQuery query)
+        public async Task<ExecutionResult> GetResultAsync(GraphQLRequest aRequest)
         {
             var start = DateTime.UtcNow;
 
-            // https://fiyazhasan.me/graphql-with-net-core-part-v-fields-arguments-variables/
-            var inputs = query.Variables.ToInputs();
-
             // https://github.com/graphql-dotnet/examples/blob/master/src/AspNetWebApi/WebApi/Controllers/GraphQLController.cs
-            var result = await new DocumentExecuter().ExecuteAsync(_ =>
+            ExecutionResult json = await new DocumentExecuter().ExecuteAsync(_ =>
             {
                 _.Schema = new MySchema().GraphQLSchema;
-                _.Query = query.Query;
-                _.OperationName = query.OperationName;
-                _.Inputs = inputs;
+                _.Query = aRequest.Query;
+                _.OperationName = aRequest.OperationName;
+                _.Variables = aRequest.Variables;
                 _.EnableMetrics = true;
             });
 
-            result.EnrichWithApolloTracing(start);
+            json.EnrichWithApolloTracing(start);
 
-            return result;
+            return json;
 
         }
     }

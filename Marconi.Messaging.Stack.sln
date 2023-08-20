@@ -23,11 +23,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Marconi.Relay", "Marconi.Re
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Marconi.Edge", "Marconi.Edge", "{828AE8FB-93A8-4088-844A-52C38E86EF76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDir.GraphQLSchema", "WinDir.GraphQLSchema\WinDir.GraphQLSchema.csproj", "{1B53A1F1-6018-4523-901A-1576A98B9E10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDir.GraphQLSchema", "WinDir.GraphQLSchema\WinDir.GraphQLSchema.csproj", "{1B53A1F1-6018-4523-901A-1576A98B9E10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDir.GraphQLResolver", "WinDir.GraphQLResolver\WinDir.GraphQLResolver.csproj", "{245A3B9C-A896-4883-9F20-52B558AE84C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDir.GraphQLResolver", "WinDir.GraphQLResolver\WinDir.GraphQLResolver.csproj", "{245A3B9C-A896-4883-9F20-52B558AE84C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDir.TestGraphQLResolver", "WinDir.TestGraphQLResolver\WinDir.TestGraphQLResolver.csproj", "{1CC91055-665F-4BF0-AADB-DD4685D221C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDir.TestGraphQLResolver", "WinDir.TestGraphQLResolver\WinDir.TestGraphQLResolver.csproj", "{1CC91055-665F-4BF0-AADB-DD4685D221C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

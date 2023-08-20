@@ -73,3 +73,27 @@ We add 2 secrets to our key vault:
 2. chitChatKey - a service bus connection string that only allows to post and receive messages. We create a ChitChatAccessKey for this. This secret is returned when a Marconi Number is successfully validated. Messaging participants include a localized resource (server), where a queue is created and requests are answered, as well as a client, which posts requests. 
 
 After publishing these changes, we need to add the key vault access parameter to the web app config.
+
+## Creating a Marconi.Edge Client
+
+The edge side of a Marconi Session utilizes a GraphQL resolver that receives messages from the Marconi Relay containing a GrphQL request. It then utilizes local resources to create a GraphQL response, which goes back into the relay.
+
+### Creating a GraphQL Schema Library
+
+The schema defines the routes and object types available. In this example we only have a hello endpoint, which returns a simple string: "Guglielmo Marconi(4/25/1874 – 7/201937)".
+
+### creating a Resolver
+
+The resolver contains the actual execution code.
+
+### Creating a Test Console App 
+
+This project acts as a test project to understand logic flow and be able to validate functionality of the GraphQL resolver.
+
+### Creating an Edge Application for the Marconi Relay
+
+This application has 3 main responsibilites:
+
+1. authenticate a user against our B2C directory
+1. request new Marconi Nr and close existing session (i.e. start a call and hang up)
+1. receive and resolve requests

@@ -70,6 +70,6 @@ The following helper classes are added to the shared project:
 We add 2 secrets to our key vault:
 
 1. queueManager - a service bus connection string that can manage queues. We can simply utilize the RootManageSharedAccessKey we used earlier to test the service bus. This secret is only available to the web api.
-2. chitChatKey - a service bus connection string that only allows to post and receive messages. We create a SendAndListenSharedAccessKey for this. This secret is returned when a Marconi Number is successfully validated. Messaging participants include a localized resource (server), where a queue is created and requests are answered, as well as a client, which posts requests. 
+2. chitChatKey - a service bus connection string that only allows to post and receive messages. We create a ChitChatAccessKey for this. This secret is returned when a Marconi Number is successfully validated. Messaging participants include a localized resource (server), where a queue is created and requests are answered, as well as a client, which posts requests. 
 
 After publishing these changes, we need to add the key vault access parameter to the web app config.

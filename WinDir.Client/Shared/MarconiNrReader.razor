@@ -1,0 +1,26 @@
+﻿@inject GraphqlService GraphqlService
+
+<h3>MarconiNr</h3>
+<input id="marconiNr" class="form-control" placeholder="Enter Marconi #" @bind="MarconiNr" />
+
+@code {
+    private string _marconiNr;
+    private string MarconiNr
+    {
+        get
+        {
+            return _marconiNr;
+        }
+        set
+        {
+            _marconiNr = value;
+            GraphqlService.SetMarconiNrAsync(value);
+
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _marconiNr = GraphqlService.MarconiNr;
+    }
+}

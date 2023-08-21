@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDir.TestGraphQLResolver"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Marconi.Cloud", "Marconi.Cloud", "{68685BB3-6444-4E05-B2FC-90077919C4F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDir.Client", "WinDir.Client\WinDir.Client.csproj", "{75C21BEC-9409-4144-BE38-DF590962CEC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinDir.Client", "WinDir.Client\WinDir.Client.csproj", "{75C21BEC-9409-4144-BE38-DF590962CEC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDir.DesktopClient", "WinDir.DesktopClient\WinDir.DesktopClient.csproj", "{06D97CCF-94E7-41DD-801A-1D192DFEC1A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{75C21BEC-9409-4144-BE38-DF590962CEC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75C21BEC-9409-4144-BE38-DF590962CEC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75C21BEC-9409-4144-BE38-DF590962CEC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D97CCF-94E7-41DD-801A-1D192DFEC1A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D97CCF-94E7-41DD-801A-1D192DFEC1A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D97CCF-94E7-41DD-801A-1D192DFEC1A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D97CCF-94E7-41DD-801A-1D192DFEC1A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{245A3B9C-A896-4883-9F20-52B558AE84C0} = {828AE8FB-93A8-4088-844A-52C38E86EF76}
 		{1CC91055-665F-4BF0-AADB-DD4685D221C4} = {828AE8FB-93A8-4088-844A-52C38E86EF76}
 		{75C21BEC-9409-4144-BE38-DF590962CEC8} = {68685BB3-6444-4E05-B2FC-90077919C4F2}
+		{06D97CCF-94E7-41DD-801A-1D192DFEC1A2} = {828AE8FB-93A8-4088-844A-52C38E86EF76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1B2F30A4-F211-4B8A-8791-C4FDAD4F3075}

@@ -2,6 +2,7 @@
 using GraphQL.SystemTextJson;
 using GraphQL.Transport;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Text;
 using WinDir.GraphQLResolver;
 using WinDir.GraphQLResolver.GraphQL;
@@ -12,7 +13,14 @@ var query = @"{
  ""query"": ""{ hello }""
 }";
 
-var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(query);
+var query2 = @"{ ""OperationName"":null,""Query"":""{\n  hello\n}\n\n\n"",""Variables"":{ ""MarconiNr"":""162-509-2553""},""Extensions"":null}";
+
+var aJObject = JsonConvert.DeserializeObject<JObject>(query2);
+aJObject["operationName"] = aJObject.Properties().First(x => x.Name == "OperationName").Value;
+aJObject["query"] = aJObject.Properties().First(x => x.Name == "Query").Value;
+aJObject["variables"] = aJObject.Properties().First(x => x.Name == "Variables").Value;
+aJObject["extensions"] = aJObject.Properties().First(x => x.Name == "Extensions").Value;
+var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(aJObject.ToString());
 
 var result = await aEntry.GetResultAsync(request);
 

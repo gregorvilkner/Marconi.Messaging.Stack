@@ -60,7 +60,8 @@ namespace WinDir.Client.GraphQL
 
 
             //var message = new Message(Encoding.UTF8.GetBytes(context.Document.OriginalQuery))
-            var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Request.Query)))
+            //var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Request.Query)))
+            var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Request)))
             {
                 ContentType = "application/json",
                 Label = "Request",

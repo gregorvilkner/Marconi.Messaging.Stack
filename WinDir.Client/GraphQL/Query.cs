@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WinDir.GraphQLSchema.GraphQLModel;
 using WinDir.GraphQLSchema.IGraphQl;
 
 namespace WinDir.Client.GraphQL
@@ -14,5 +15,10 @@ namespace WinDir.Client.GraphQL
             return "Guglielmo Marconi (4/25/1874 – 7/20/1937)";
         }
 
+        [GraphQLMetadata("folder")]
+        public QLFolder GetFolder(string aFolderDir)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

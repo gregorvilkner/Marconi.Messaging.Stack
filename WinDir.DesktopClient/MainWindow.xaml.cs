@@ -252,6 +252,10 @@ namespace WinDir.DesktopClient
                         ResolverEntry aEntry = new ResolverEntry();
                         //var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(queryJsonString);
 
+                        // very strange - would like to get this fixed
+                        // GraphQLSerializer().Deserialize<GraphQLRequest> wants the json keys in lower case
+                        // but the GraphQLRequest class has them in upper case
+                        // probably something with which serializer we use and what options
                         var aJObject = JsonConvert.DeserializeObject<JObject>(queryJsonString);
                         aJObject["operationName"] = aJObject.Properties().First(x => x.Name == "OperationName").Value;
                         aJObject["query"] = aJObject.Properties().First(x => x.Name == "Query").Value;

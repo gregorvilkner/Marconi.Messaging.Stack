@@ -45,6 +45,8 @@ namespace WinDir.Client.Controllers
                     _.EnableMetrics = true;
                 });
 
+                json.EnrichWithApolloTracing(start);
+
                 // https://www.lucanatali.it/c-from-string-to-stream-and-from-stream-to-string/
                 var ms = new MemoryStream();
                 var sw = new StreamWriter(ms);

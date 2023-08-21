@@ -38,7 +38,7 @@ namespace WinDir.GraphQLResolver.GraphQLModel
                     {
                         files.Add(new QLFile
                         {
-                            name = aFile
+                            name = Path.GetFileName(aFile)
                         });
                     }
                 }

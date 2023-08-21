@@ -9,6 +9,7 @@ namespace WinDir.Client.GraphQL
 {
     public class Query : ObjectGraphType, IQuery
     {
+
         [GraphQLMetadata("hello")]
         public string GetHello()
         {
@@ -16,9 +17,11 @@ namespace WinDir.Client.GraphQL
         }
 
         [GraphQLMetadata("folder")]
-        public QLFolder GetFolder(string aFolderDir)
+        public QLFolder GetFolder(IResolveFieldContext context, string aFolderDir)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
+        
+
     }
 }

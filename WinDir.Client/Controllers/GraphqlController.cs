@@ -29,8 +29,8 @@ namespace WinDir.Client.Controllers
 
             if (
                 aRequest.OperationName == "IntrospectionQuery" 
-                || aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("IntrospectionQuery") 
-                //|| aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("{hello}")
+                || aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("IntrospectionQuery")
+                || aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("{hello}")
                 )
             {
 

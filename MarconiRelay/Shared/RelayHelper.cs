@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.KeyVault;
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Identity.Client;
 using System;
@@ -15,55 +16,27 @@ namespace MarconiRelay.Shared
         string TenantId { get; set; }
         string ClientId { get; set; }
         string ClientSecret { get; set; }
-        string authority
-        {
-            get
-            {
-                var aAuthority = $"https://login.microsoftonline.com/{TenantId}/oauth2v2.0/token";
-                return aAuthority;
-            }
-        }
-        IConfidentialClientApplication _app { get; set; }
-        IConfidentialClientApplication app 
-        {
-            get
-            {
-                if (_app == null)
-                {
-                    _app = ConfidentialClientApplicationBuilder.Create(ClientId)
-                    .WithAuthority(authority)
-                    .WithClientSecret(ClientSecret)
-                    .Build();
-                }
-                return _app;
-            }
-        }
 
         static string keyVaultName = "MarconiRelayKeyVault";
         static string keyVaultUri = "https://" + keyVaultName + ".vault.azure.net";
         static string[] keyVaultScopes = new string[] { "https://vault.azure.net/.default" };
-        KeyVaultClient _keyVaultClient { get; set; }
-        KeyVaultClient KeyVaultClient
+        SecretClient _keyVaultClient { get; set; }
+        SecretClient KeyVaultClient
         {
             get
             {
                 if (_keyVaultClient == null)
                 {
-                    _keyVaultClient = new KeyVaultClient(async (authority, resource, scope) =>
-                    {
-                        AuthenticationResult authenticationResult = await app.AcquireTokenForClient(keyVaultScopes).ExecuteAsync();
-                        return authenticationResult.AccessToken;
-                    });
+                    _keyVaultClient = new SecretClient(new Uri(keyVaultUri), new ClientSecretCredential(TenantId, ClientId, ClientSecret));
                 }
                 return _keyVaultClient;
             }
         }
 
-
         async Task<ManagementClient> GetManagementClientAsync() 
         {
-            var aSecret = await KeyVaultClient.GetSecretAsync(keyVaultUri, "queueManager");
-            var connectionString = aSecret.Value;
+            var aSecret = await KeyVaultClient.GetSecretAsync("queueManager");
+            var connectionString = aSecret.Value.Value;
             var aManagementClient = new ManagementClient(connectionString);
             return aManagementClient;
         }
@@ -92,8 +65,8 @@ namespace MarconiRelay.Shared
             var MarconiQueues = await GetMarconiQueuesAsync();
             if (MarconiQueues.Where(q => q.Path == MarconiNr.ToLower()).Count() > 0)
             {
-                var aSecret = await KeyVaultClient.GetSecretAsync(keyVaultUri, "chitChatKey");
-                var chitChatKey = aSecret.Value;
+                var aSecret = await KeyVaultClient.GetSecretAsync("chitChatKey");
+                var chitChatKey = aSecret.Value.Value;
                 return chitChatKey;
             }
             return null;

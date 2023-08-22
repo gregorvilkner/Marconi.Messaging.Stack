@@ -1,12 +1,8 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Microsoft.Azure.ServiceBus.Management;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
+using Azure;
 
 namespace MarconiRelay.Shared
 {
@@ -33,24 +29,30 @@ namespace MarconiRelay.Shared
             }
         }
 
-        async Task<ManagementClient> GetManagementClientAsync() 
+        async Task<ServiceBusAdministrationClient> GetManagementClientAsync() 
         {
             var aSecret = await KeyVaultClient.GetSecretAsync("queueManager");
             var connectionString = aSecret.Value.Value;
-            var aManagementClient = new ManagementClient(connectionString);
+            var aManagementClient = new ServiceBusAdministrationClient(connectionString);
             return aManagementClient;
         }
 
-        async Task<IList<QueueDescription>> GetMarconiQueuesAsync()
+        async Task<List<QueueProperties>> GetMarconiQueuesAsync()
         {
             var ManagementClient = await GetManagementClientAsync();
-            var MarconiQueues = await ManagementClient.GetQueuesAsync();
-            return MarconiQueues;
+            AsyncPageable<QueueProperties> MarconiQueues = ManagementClient.GetQueuesAsync();
+            
+            List<QueueProperties> queues = new List<QueueProperties>();
+            await foreach(var aQueueProperty in MarconiQueues)
+            {
+                queues.Add(aQueueProperty);
+            }
+
+            return queues;
         }
-        async Task<IList<QueueDescription>> GetMarconiQueuesAsync(ManagementClient ManagementClient)
+        async Task<List<QueueProperties>> GetMarconiQueuesAsync(ServiceBusAdministrationClient ManagementClient)
         {
-            var MarconiQueues = await ManagementClient.GetQueuesAsync();
-            return MarconiQueues;
+            return await GetMarconiQueuesAsync();
         }
 
         public RelayHelper(string _clientId, string _clientSecret, string _tenantId)
@@ -63,7 +65,7 @@ namespace MarconiRelay.Shared
         public async Task<string> ValidateMarconiNr(string MarconiNr)
         {
             var MarconiQueues = await GetMarconiQueuesAsync();
-            if (MarconiQueues.Where(q => q.Path == MarconiNr.ToLower()).Count() > 0)
+            if (MarconiQueues.Where(q => q.Name == MarconiNr.ToLower()).Count() > 0)
             {
                 var aSecret = await KeyVaultClient.GetSecretAsync("chitChatKey");
                 var chitChatKey = aSecret.Value.Value;
@@ -80,14 +82,14 @@ namespace MarconiRelay.Shared
         public async Task<IEnumerable<string>> GetAllMarconiNrsAsync(string userId)
         {
             var MarconiQueues = await GetMarconiQueuesAsync();
-            return MarconiQueues.Where(x=>x.UserMetadata==userId).Select(x => x.Path);
+            return MarconiQueues.Where(x=>x.UserMetadata==userId).Select(x => x.Name);
         }
 
         public async Task DeleteMarconiNr(string MarconiNr, string userId)
         {
             var ManagementClient = await GetManagementClientAsync();
             var MarconiQueues = await GetMarconiQueuesAsync(ManagementClient);
-            if (MarconiQueues.Where(q => q.Path == MarconiNr.ToLower() && q.UserMetadata == userId).Count() > 0)
+            if (MarconiQueues.Where(q => q.Name == MarconiNr.ToLower() && q.UserMetadata == userId).Count() > 0)
             {
                 await ManagementClient.DeleteQueueAsync(MarconiNr);
             }
@@ -99,19 +101,16 @@ namespace MarconiRelay.Shared
             var MarconiQueues = await GetMarconiQueuesAsync(ManagementClient);
 
             string MarconiNr = MarconiNrMaker.CreateNr();
-            while (MarconiQueues.Where(q => q.Path == MarconiNr.ToLower()).Count() > 0)
+            while (MarconiQueues.Where(q => q.Name == MarconiNr.ToLower()).Count() > 0)
             {
                 MarconiNr = MarconiNrMaker.CreateNr();
             }
 
-            QueueDescription aQueueDescription = new QueueDescription(MarconiNr)
+            var newQueue = await ManagementClient.CreateQueueAsync(new CreateQueueOptions(MarconiNr)
             {
-                //AutoDeleteOnIdle = TimeSpan.FromMinutes(30),
-                DefaultMessageTimeToLive = TimeSpan.FromMinutes(1),
+                DefaultMessageTimeToLive=TimeSpan.FromMinutes(1),
                 UserMetadata=userId
-            };
-
-            var newQueue = await ManagementClient.CreateQueueAsync(aQueueDescription);
+            });
 
             return MarconiNr;
         }

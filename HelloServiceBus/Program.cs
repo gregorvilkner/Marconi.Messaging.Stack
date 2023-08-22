@@ -33,8 +33,13 @@ namespace HelloServiceBus
                 }
             }
 
-            var newQueue = await AdminClient.CreateQueueAsync(queueName);
+            //var newQueue = await AdminClient.CreateQueueAsync(queueName);
 
+            var newQueue = await AdminClient.CreateQueueAsync(new CreateQueueOptions(queueName)
+            {
+                DefaultMessageTimeToLive = TimeSpan.FromMinutes(1),
+                UserMetadata = "user123"
+            });
 
         }
     }

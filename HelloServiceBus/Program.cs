@@ -27,9 +27,10 @@ namespace HelloServiceBus
             await foreach (var item in allQueues)
             {
                 Console.WriteLine(item.Name);
-                if (item.Name == queueName)
+                //if (item.Name == queueName)
+                if (true)
                 {
-                    await AdminClient.DeleteQueueAsync(item.Name);
+                    var aResponse = await AdminClient.DeleteQueueAsync(item.Name);
                 }
             }
 

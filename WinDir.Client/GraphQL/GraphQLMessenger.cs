@@ -1,18 +1,7 @@
-﻿using GraphQL;
+﻿using Azure.Messaging.ServiceBus;
 using GraphQL.Transport;
-using GraphQL.Types;
-using Microsoft.Azure.ServiceBus;
-using Microsoft.Azure.ServiceBus.Management;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace WinDir.Client.GraphQL
 {
@@ -25,15 +14,10 @@ namespace WinDir.Client.GraphQL
         string MarconiNr { get; set; }
         string MarconiKey { get; set; }
 
-        ServiceBusConnectionStringBuilder ServiceBusConnectionStringBuilder
-        {
-            get
-            {
-                return new ServiceBusConnectionStringBuilder(serviceBusEndpoint, MarconiNr, MarconiKeyName, MarconiKey);
-            }
-        }
+        private ServiceBusClient serviceBusClient;
+        private ServiceBusSender serviceBusSender;
+        private ServiceBusProcessor serviceBusProcessor;
 
-        private IQueueClient queueClient;
         private GraphQLRequest Request { get; set; }
 
         private string messageId { get; set; }
@@ -56,27 +40,48 @@ namespace WinDir.Client.GraphQL
 
             messageId = Guid.NewGuid().ToString();
 
-            queueClient = new QueueClient(ServiceBusConnectionStringBuilder);
+            serviceBusClient = new ServiceBusClient(MarconiKey);
+            serviceBusSender = serviceBusClient.CreateSender(MarconiNr);
 
-
-            //var message = new Message(Encoding.UTF8.GetBytes(context.Document.OriginalQuery))
-            //var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Request.Query)))
-            var message = new Message(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(Request)))
+            var message = new ServiceBusMessage(JsonConvert.SerializeObject(Request))
             {
                 ContentType = "application/json",
-                Label = "Request",
+                Subject = "Request",
                 MessageId = messageId,
                 ReplyTo = MarconiNr,
                 TimeToLive = TimeSpan.FromMinutes(5)
             };
 
-            // Register QueueClient's MessageHandler and receive messages in a loop
-            RegisterOnMessageHandlerAndReceiveMessages();
+            // Register the function that will process messages
+            try
+            {
+                serviceBusProcessor = serviceBusClient.CreateProcessor(MarconiNr);
+
+                // add handler to process messages
+                serviceBusProcessor.ProcessMessageAsync += MessageHandler;
+
+                // add handler to process any errors
+                serviceBusProcessor.ProcessErrorAsync += ErrorHandler;
+
+                // start processing 
+                await serviceBusProcessor.StartProcessingAsync();
+            }
+            catch (Exception ex)
+            {
+                var m = ex.Message;
+            }
 
             // Send the message to the queue
-            await queueClient.SendAsync(message);
+            await serviceBusSender.SendMessageAsync(message);
 
             return true;
+        }
+
+        // handle any errors when receiving messages
+        Task ErrorHandler(ProcessErrorEventArgs args)
+        {
+            Console.WriteLine(args.Exception.ToString());
+            return Task.CompletedTask;
         }
 
         public async Task Wait4Response()
@@ -90,50 +95,32 @@ namespace WinDir.Client.GraphQL
                 await Task.Delay(25);
             }
 
-            await queueClient.CloseAsync();
+            await serviceBusProcessor.CloseAsync();
         }
 
-        private void RegisterOnMessageHandlerAndReceiveMessages()
+        async Task MessageHandler(ProcessMessageEventArgs args)
+
         {
-            // Configure the MessageHandler Options in terms of exception handling, number of concurrent messages to deliver etc.
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
-            {
-                // Maximum number of Concurrent calls to the callback `ProcessMessagesAsync`, set to 1 for simplicity.
-                // Set it according to how many messages the application wants to process in parallel.
-                MaxConcurrentCalls = 1,
-
-                // Indicates whether MessagePump should automatically complete the messages after returning from User Callback.
-                // False below indicates the Complete will be handled by the User Callback as in `ProcessMessagesAsync` below.
-                AutoComplete = false
-            };
-
-            // Register the function that will process messages
-            queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
-        }
-
-        private async Task ProcessMessagesAsync(Message message, CancellationToken token)
-        {
+            var message = args.Message;
             // Process the message
             //Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
             try
             {
-                if (message.Label == "Response" && message.CorrelationId == messageId)
+                if (message.Subject == "Response" && message.CorrelationId == messageId)
                 {
 
-                    // Complete the message so that it is not received again.
-                    // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
-                    await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+                    await args.CompleteMessageAsync(args.Message);
 
-                    var responseJsone = Encoding.UTF8.GetString(message.Body);
+                    var responseJson = message.Body.ToString();
 
-                    JResponse = JObject.Parse(responseJsone);
+                    JResponse = JObject.Parse(responseJson);
 
                     JResponseIsReady = true;
                 }
                 else
                 {
 
-                    await queueClient.AbandonAsync(message.SystemProperties.LockToken);
+                    await args.AbandonMessageAsync(message);
                 }
             }
             catch (Exception e)
@@ -145,16 +132,6 @@ namespace WinDir.Client.GraphQL
             // to avoid unnecessary exceptions.
         }
 
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
-        {
-            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
-            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-            Console.WriteLine("Exception context for troubleshooting:");
-            Console.WriteLine($"- Endpoint: {context.Endpoint}");
-            Console.WriteLine($"- Entity Path: {context.EntityPath}");
-            Console.WriteLine($"- Executing Action: {context.Action}");
-            return Task.CompletedTask;
-        }
 
     }
 }

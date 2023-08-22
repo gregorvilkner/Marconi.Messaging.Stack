@@ -97,3 +97,9 @@ This application has 3 main responsibilites:
 1. authenticate a user against our B2C directory
 1. request new Marconi Nr and close existing session (i.e. start a call and hang up)
 1. receive and resolve requests
+
+We use a WPF desktop application to achieve this.
+
+## Creating a Cloud-Based Marconi Client
+
+This application hosts the user-facing GraphQL endpoint. We supply the name of a service bus queue (e.g. a Marconi Number) as a GraphQL variable. When queries are posted to the GraphQL controller, we serialize the request and post it into the service bus as a "request". The edge client will pickup the message from the service bus, deserialize the GraphQL request, resolve it, and post a GraphQL result serialized into the service bus as a "response". The response is received by the controller and thus returned to the user. This roundtrip typically takes less than a second and works really well.

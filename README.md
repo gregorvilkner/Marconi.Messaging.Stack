@@ -103,3 +103,21 @@ We use a WPF desktop application to achieve this.
 ## Creating a Cloud-Based Marconi Client
 
 This application hosts the user-facing GraphQL endpoint. We supply the name of a service bus queue (e.g. a Marconi Number) as a GraphQL variable. When queries are posted to the GraphQL controller, we serialize the request and post it into the service bus as a "request". The edge client will pickup the message from the service bus, deserialize the GraphQL request, resolve it, and post a GraphQL result serialized into the service bus as a "response". The response is received by the controller and thus returned to the user. This roundtrip typically takes less than a second and works really well.
+
+1. create a new server based blazor web app
+1. activate controllers
+    1. add MapControllers() to startup.cs
+    1. add Controlers foler
+    1. add ValuesController.cs for testing
+1. add GraphQL controller and dependencies
+    1. add, clean up and resolve Controllers/GraphqlController.cs
+    1. add, clean up and resolve Data/GraphqlService.cs
+    1. add, clean up and resolve GraphQL/ GraphQLMessenger.cs, MySchema.cs, and Query.cs (optionally add a Mutation.cs file)
+    1. add builder.Services.AddScoped<GraphqlService>();
+ in program.cs
+1. add GraphiQL middleware to program.cs
+    1. add app.UseGraphiQl(); (nuget graphiql)
+    1. add builder.Services.AddControllers().AddNewtonsoftJson(); (nuget Microsoft.AspNetCore.Mvc.NewtonsoftJson)
+1. add menuitems and OnChange methods on Shared/NavMenu.razor
+1. add Shared/MarconiNrReader.razor
+1. adjust Parges/Index.razor

@@ -23,9 +23,8 @@ namespace WinDir.Client.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(JObject queryJson)
+        public async Task<IActionResult> Post(GraphQLRequest aRequest)
         {
-            var aRequest = new GraphQLSerializer().Deserialize<GraphQLRequest>(JsonConvert.SerializeObject(queryJson));
 
             if (
                 aRequest.OperationName == "IntrospectionQuery" 
@@ -66,20 +65,22 @@ namespace WinDir.Client.Controllers
 
                 var schema = new MySchema();
 
-                if (queryJson.ContainsKey("variables"))
+                if (aRequest.Variables.ContainsKey("MarconiNr"))
                 {
-                    if ((queryJson["variables"] as JObject).ContainsKey("MarconiNr"))
-                    {
-                        await _graphqlService.SetMarconiNrAsync(queryJson["variables"]["MarconiNr"].Value<string>());
-                    }
+                    await _graphqlService.SetMarconiNrAsync(aRequest.Variables["MarconiNr"].ToString());
                 }
-
                 ExecutionResult json = new ExecutionResult();
                 json.Errors = new ExecutionErrors();
 
-                if (_graphqlService.MarconiKey == "")
+                if (_graphqlService.MarconiKey == "" || _graphqlService.MarconiKey == null)
                 {
-                    json.Errors.Add(new ExecutionError("Invalid or missing MarconiNr."));
+                    if(_graphqlService.MarconiKey == null)
+                    {
+                        json.Errors.Add(new ExecutionError("Missing MarconiNr."));
+                    } else
+                    {
+                        json.Errors.Add(new ExecutionError("Invalid MarconiNr."));
+                    }
 
                     var ms = new MemoryStream();
                     var sw = new StreamWriter(ms);

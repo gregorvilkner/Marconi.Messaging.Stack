@@ -9,20 +9,14 @@ using WinDir.GraphQLResolver.GraphQL;
 
 ResolverEntry aEntry = new ResolverEntry();
 
-var query = @"{
- ""query"": ""{ hello }""
-}";
+var query = new GraphQLRequest
+{
+    Query="{hello}"
+};
 
-var query2 = @"{ ""OperationName"":null,""Query"":""{\n  hello\n}\n\n\n"",""Variables"":{ ""MarconiNr"":""162-509-2553""},""Extensions"":null}";
+var query2 = JsonConvert.DeserializeObject<GraphQLRequest>(@"{ ""OperationName"":null,""Query"":""{\n  hello\n}\n\n\n"",""Variables"":{ ""MarconiNr"":""162-509-2553""},""Extensions"":null}");
 
-var aJObject = JsonConvert.DeserializeObject<JObject>(query2);
-aJObject["operationName"] = aJObject.Properties().First(x => x.Name == "OperationName").Value;
-aJObject["query"] = aJObject.Properties().First(x => x.Name == "Query").Value;
-aJObject["variables"] = aJObject.Properties().First(x => x.Name == "Variables").Value;
-aJObject["extensions"] = aJObject.Properties().First(x => x.Name == "Extensions").Value;
-var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(aJObject.ToString());
-
-var result = await aEntry.GetResultAsync(request);
+var result = await aEntry.GetResultAsync(query2);
 
 // https://www.lucanatali.it/c-from-string-to-stream-and-from-stream-to-string/
 var ms = new MemoryStream();

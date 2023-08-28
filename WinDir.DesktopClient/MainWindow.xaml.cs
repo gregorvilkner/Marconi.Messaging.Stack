@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using GraphQL;
-using GraphQL.SystemTextJson;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Transport;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -227,18 +227,8 @@ namespace WinDir.DesktopClient
                         string queryJsonString = message.Body.ToString();
 
                         ResolverEntry aEntry = new ResolverEntry();
-                        //var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(queryJsonString);
 
-                        // very strange - would like to get this fixed
-                        // GraphQLSerializer().Deserialize<GraphQLRequest> wants the json keys in lower case
-                        // but the GraphQLRequest class has them in upper case
-                        // probably something with which serializer we use and what options
-                        var aJObject = JsonConvert.DeserializeObject<JObject>(queryJsonString);
-                        aJObject["operationName"] = aJObject.Properties().First(x => x.Name == "OperationName").Value;
-                        aJObject["query"] = aJObject.Properties().First(x => x.Name == "Query").Value;
-                        aJObject["variables"] = aJObject.Properties().First(x => x.Name == "Variables").Value;
-                        aJObject["extensions"] = aJObject.Properties().First(x => x.Name == "Extensions").Value;
-                        var request = new GraphQLSerializer().Deserialize<GraphQLRequest>(aJObject.ToString());
+                        var request = JsonConvert.DeserializeObject<GraphQLRequest>(queryJsonString);
 
                         result = await aEntry.GetResultAsync(request);
 
@@ -253,16 +243,10 @@ namespace WinDir.DesktopClient
 
                 try
                 {
-                    // https://www.lucanatali.it/c-from-string-to-stream-and-from-stream-to-string/
-                    var ms = new MemoryStream();
-                    var sw = new StreamWriter(ms);
+                    var stringWriter = new StringWriter();
+                    new GraphQLSerializer().Write(stringWriter, result);
 
-                    await new GraphQLSerializer().WriteAsync(ms, result);
-
-                    string resultJson = Encoding.ASCII.GetString(ms.ToArray());
-
-                    //var responseJson = await new GraphQL.SystemTextJson.DocumentWriter(true).WriteToStringAsync(result);
-                    var responseMessage = new ServiceBusMessage(resultJson)
+                    var responseMessage = new ServiceBusMessage(stringWriter.ToString())
                     {
                         ContentType = "application/json",
                         Subject = "Response",

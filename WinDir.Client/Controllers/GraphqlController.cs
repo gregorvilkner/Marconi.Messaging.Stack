@@ -1,6 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Instrumentation;
-using GraphQL.SystemTextJson;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Transport;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -27,7 +27,7 @@ namespace WinDir.Client.Controllers
         {
 
             if (
-                aRequest.OperationName == "IntrospectionQuery" 
+                aRequest.OperationName == "IntrospectionQuery"
                 || aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("IntrospectionQuery")
                 || aRequest.Query.Replace("\n", "").Replace(" ", "").Contains("{hello}")
                 )
@@ -35,7 +35,7 @@ namespace WinDir.Client.Controllers
 
                 var start = DateTime.UtcNow;
 
-                ExecutionResult json = await new DocumentExecuter().ExecuteAsync(_ =>
+                ExecutionResult result = await new DocumentExecuter().ExecuteAsync(_ =>
                 {
                     _.Schema = new MySchema().GraphQLSchema;
                     _.Query = aRequest.Query;
@@ -44,18 +44,13 @@ namespace WinDir.Client.Controllers
                     _.EnableMetrics = true;
                 });
 
-                json.EnrichWithApolloTracing(start);
+                result.EnrichWithApolloTracing(start);
 
-                // https://www.lucanatali.it/c-from-string-to-stream-and-from-stream-to-string/
-                var ms = new MemoryStream();
-                var sw = new StreamWriter(ms);
+                var stringWriter = new StringWriter();
+                new GraphQLSerializer().Write(stringWriter, result);
+                JObject returnObject = JObject.Parse(stringWriter.ToString());
 
-                await new GraphQLSerializer().WriteAsync(ms, json);
-
-                string resultJson = Encoding.ASCII.GetString(ms.ToArray());
-
-
-                return Ok(JObject.Parse(resultJson));
+                return Ok();
 
             }
             else
@@ -69,27 +64,25 @@ namespace WinDir.Client.Controllers
                 {
                     await _graphqlService.SetMarconiNrAsync(aRequest.Variables["MarconiNr"].ToString());
                 }
-                ExecutionResult json = new ExecutionResult();
-                json.Errors = new ExecutionErrors();
+                ExecutionResult result = new ExecutionResult();
+                result.Errors = new ExecutionErrors();
 
                 if (_graphqlService.MarconiKey == "" || _graphqlService.MarconiKey == null)
                 {
-                    if(_graphqlService.MarconiKey == null)
+                    if (_graphqlService.MarconiKey == null)
                     {
-                        json.Errors.Add(new ExecutionError("Missing MarconiNr."));
-                    } else
+                        result.Errors.Add(new ExecutionError("Missing MarconiNr."));
+                    }
+                    else
                     {
-                        json.Errors.Add(new ExecutionError("Invalid MarconiNr."));
+                        result.Errors.Add(new ExecutionError("Invalid MarconiNr."));
                     }
 
-                    var ms = new MemoryStream();
-                    var sw = new StreamWriter(ms);
+                    var stringWriter = new StringWriter();
+                    new GraphQLSerializer().Write(stringWriter, result);
+                    JObject returnObject = JObject.Parse(stringWriter.ToString());
 
-                    await new GraphQLSerializer().WriteAsync(ms, json);
-
-                    string resultJson = Encoding.ASCII.GetString(ms.ToArray());
-
-                    return Ok(JObject.Parse(resultJson));
+                    return Ok(returnObject);
 
                 }
                 else
@@ -99,16 +92,13 @@ namespace WinDir.Client.Controllers
                     await aMessenger.Wait4Response();
                     if (aMessenger.JResponseIsReady == false)
                     {
-                        json.Errors.Add(new ExecutionError("Marconi call timed out (40sec)..."));
+                        result.Errors.Add(new ExecutionError("Marconi call timed out (40sec)..."));
 
-                        var ms = new MemoryStream();
-                        var sw = new StreamWriter(ms);
+                        var stringWriter = new StringWriter();
+                        new GraphQLSerializer().Write(stringWriter, result);
+                        JObject returnObject = JObject.Parse(stringWriter.ToString());
 
-                        await new GraphQLSerializer().WriteAsync(ms, json);
-
-                        string resultJson = Encoding.ASCII.GetString(ms.ToArray());
-
-                        return Ok(JObject.Parse(resultJson));
+                        return Ok(returnObject);
 
                     }
                     else

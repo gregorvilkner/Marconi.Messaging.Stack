@@ -50,7 +50,7 @@ namespace WinDir.Client.Controllers
                 new GraphQLSerializer().Write(stringWriter, result);
                 JObject returnObject = JObject.Parse(stringWriter.ToString());
 
-                return Ok();
+                return Ok(returnObject);
 
             }
             else

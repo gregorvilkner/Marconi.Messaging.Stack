@@ -4,19 +4,15 @@ The Marconi Messaging Stack allows accessing of local assets by means of using G
 
 ## How is Marconi Different?
 
-Guglielmo Marconi is credited for the creation of a practical radio wave-based wireless telgraph system. By taking the wired things away and going wireless he increased the range of telegraph communication from houndreds of miles to thousands of miles. In the case of modern IP-based communication the Marconi Communication Stack can be understood to remove the LAN and IP-Sec barrier, and allow communciation accross the web, making local recourses accessible to remote clients.
+Guglielmo Marconi is credited for the creation of a practical radio wave-based wireless telgraph system. By taking the wired things away and going wireless he increased the range of telegraph communication from houndreds of miles to thousands of miles. In the case of modern IP-based communication the Marconi Communication Stack can be understood to remove the LAN and IP-Sec barrier, and allow communciation accross the web, making local resources accessible to remote clients.
 
 ### Why GraphQL and Service Bus
 
-The core concept of the Marconi Communication Stack is to use GraphQL as a means of request and response: GraphQLRequest and GraphQLResponse. Both, both the GraphQLRequest and the GraphQLResponse are standardized and strongly typed, both are serializable, and both are very convenient means of querying a server. 
+The core concept of the Marconi Communication Stack is to use GraphQL as a means of request and response: GraphQLRequest and GraphQLResponse. Both, the GraphQLRequest and the GraphQLResponse are standardized and strongly typed through the schema, both are serializable, and both provide a very convenient way of interacting with a server. 
 
 Typically the request and response get serviced by the same entity. What the Marconi Communication Stack does differently, is to seperate the entity that services the request (a web-based GraphQL web api endpoint) from the entity that services the response (a GraphQL resolver with access to local resources). Both, the publicly available GraphQL endpoint and the localized GraphQL resolver communicate through a messaging system, Service Bus (but we could use any other means of exchaning json text). 
 
 A queue on this messaging stack can only be created (opened) from the locale participant, which then shares an ID of the queue, like a secret, a Marconi Number (looks like a telephone number), with the remote endpoint. Now we can access or local resource from afar, one request and response message at a time.
-
-### Message Size Limitations
-
-Messages on Service Bus are limited to 1024kB. We are able to extend this by compressing larger messages. The main use of the Marconi Messaging Stack, however, is focused on smaller payloads. Also, implementations that leverage other messengers, or simple text file exchange would allow for much greater payloads. We have not considered breaking requests or responses into batches.
 
 ### Working Implementations
 

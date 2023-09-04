@@ -14,12 +14,17 @@ Typically the request and response get serviced by the same entity. What the Mar
 
 A queue on this messaging stack can only be created (opened) from the locale participant, which then shares an ID of the queue, like a secret, a Marconi Number (looks like a telephone number), with the remote endpoint. Now we can access or local resource from afar, one request and response message at a time.
 
+### Message Size Limitations
+
+Messages on Service Bus are limited to 1024kB. We are able to extend this by compressing larger messages. The main use of the Marconi Messaging Stack, however, is focused on smaller payloads. Also, implementations that leverage other messengers, or simple text file exchange would allow for much greater payloads. We have not considered breaking requests or responses into batches.
+
 ### Working Implementations
 
 We have shown this type of Communication Stack to work well over the last 5+ years in the following scenarios:
 
 - AEC (architecture engineering and construction) - we interoperated remotely with Autodesk Revit and Autodesk AutoCAD
 - Aveva PI/AF - we have interogated PI Asset Framework (AF) remotely using the Marconi Stack, this includes both, the asset model and time series data
+- SQL - a brief PoC to show messaging of simple SQL statements and responses
 - WinDir - the reference Marconi Stack repository uses accesssing of a local PC's disk system as a show case, i.e. browse my c: drive from afar
 - OPC UA - we have used a GraphQL resolver for OPC UA to access a OPC UA server remotely
 

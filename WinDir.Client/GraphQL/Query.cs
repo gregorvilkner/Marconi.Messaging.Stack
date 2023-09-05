@@ -21,7 +21,11 @@ namespace WinDir.Client.GraphQL
         {
             throw new NotImplementedException();
         }
-        
 
+        [GraphQLMetadata("folders")]
+        public List<QLFolder> GetFolders(IResolveFieldContext context, List<string> aFolderDirList)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

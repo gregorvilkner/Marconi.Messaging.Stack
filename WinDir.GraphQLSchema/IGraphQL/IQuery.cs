@@ -12,6 +12,8 @@ namespace WinDir.GraphQLSchema.IGraphQl
         [GraphQLMetadata("folder")]
         QLFolder GetFolder(IResolveFieldContext context, string aFolderDir);
 
+        [GraphQLMetadata("folders")]
+        List<QLFolder> GetFolders(IResolveFieldContext context, List<string> aFolderDirList);
 
     }
 }

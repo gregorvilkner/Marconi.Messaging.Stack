@@ -8,6 +8,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<GraphqlService>();
+builder.Services.AddScoped<WinDirService>();
+
 
 // https://dotnetcoretutorials.com/2019/12/19/using-newtonsoft-json-in-net-core-3-projects/
 // we're doing this to switch json parsing to newtonsoft

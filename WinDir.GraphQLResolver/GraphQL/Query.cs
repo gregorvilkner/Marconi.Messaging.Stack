@@ -24,5 +24,18 @@ namespace WinDir.GraphQLResolver.GraphQL
             return new QLFolderResolve(aFolderDir, foldersField, filesField);
         }
 
+        [GraphQLMetadata("folders")]
+        public List<QLFolder> GetFolders(IResolveFieldContext context, List<string> aFolderDirList)
+        {
+            List<QLFolder> returnObjects = new List<QLFolder>();
+            foreach (var aFolderDir in aFolderDirList)
+            {
+                var foldersField = GraphQLHelpers.GetFieldFromFieldOrContext(context, "folders");
+                var filesField = GraphQLHelpers.GetFieldFromFieldOrContext(context, "files");
+                var aReturnObject = new QLFolderResolve(aFolderDir, foldersField, filesField);
+                returnObjects.Add(aReturnObject);
+            }
+            return returnObjects;
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace WinDir.Client.Controllers
     [ApiController]
     public class GraphqlController : ControllerBase
     {
-        private readonly GraphqlService _graphqlService;
+        public readonly GraphqlService _graphqlService;
 
         public GraphqlController(GraphqlService graphqlService)
         {

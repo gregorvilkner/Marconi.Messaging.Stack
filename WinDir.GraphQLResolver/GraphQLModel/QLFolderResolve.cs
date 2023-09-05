@@ -23,11 +23,17 @@ namespace WinDir.GraphQLResolver.GraphQLModel
                 if (foldersField != null)
                 {
                     folders = new List<QLFolder>();
-                    foreach (var aChildFolder in Directory.GetDirectories(dir))
+                    try
                     {
-                        var foldersChildrenField = GraphQLHelpers.GetFieldFromFieldOrContext(foldersField, "folders");
-                        var filesChildrenField = GraphQLHelpers.GetFieldFromFieldOrContext(foldersField, "files");
-                        folders.Add(new QLFolderResolve(aChildFolder, foldersChildrenField, filesChildrenField));
+                        foreach (var aChildFolder in Directory.GetDirectories(dir))
+                        {
+                            var foldersChildrenField = GraphQLHelpers.GetFieldFromFieldOrContext(foldersField, "folders");
+                            var filesChildrenField = GraphQLHelpers.GetFieldFromFieldOrContext(foldersField, "files");
+                            folders.Add(new QLFolderResolve(aChildFolder, foldersChildrenField, filesChildrenField));
+                        }
+                    }
+                    catch (Exception e)
+                    {
                     }
                 }
 

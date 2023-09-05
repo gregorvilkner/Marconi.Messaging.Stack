@@ -18,6 +18,7 @@
             type Query {
                 hello: String
                 folder(aFolderDir: String): Folder
+                folders(aFolderDirList: [String]): [Folder]
             }
 
 

@@ -27,6 +27,7 @@ namespace WinDir.Client.Data
                     variables.Add(aVariable.Key, aVariable.Value);
                 }
             }
+            request.Variables = new Inputs(variables);
 
             var resultConnect2 = await aEntry.Post(request);
 

@@ -18,11 +18,13 @@ namespace WinDir.Client.Data
         public async Task<ExecutionResult> GetGraphQLResult(GraphQLRequest request)
         {
 
-            var r = JObject.FromObject(request);
+            // attach the Marconi nr as a variable
+            JObject requestJObject = JObject.FromObject(request);
+            JObject variablesProperty = requestJObject["Variables"] as JObject != null ? requestJObject["Variables"] as JObject : new JObject();
+            variablesProperty["MarconiNr"] = aEntry._graphqlService.MarconiNr;
+            requestJObject["Variables"] = variablesProperty; 
 
-            r["Variables"] = JObject.Parse($"{{\"MarconiNr\": \"{aEntry._graphqlService.MarconiNr}\"}}");
-
-            request = r.ToObject<GraphQLRequest>();
+            request = requestJObject.ToObject<GraphQLRequest>();
 
             var resultConnect2 = await aEntry.Post(request);
 

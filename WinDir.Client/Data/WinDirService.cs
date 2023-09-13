@@ -1,8 +1,8 @@
-﻿using GraphQL.NewtonsoftJson;
+﻿using GraphQL;
+using GraphQL.NewtonsoftJson;
 using GraphQL.Transport;
-using GraphQL;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WinDir.Client.Controllers;
 using WinDir.GraphQLSchema.GraphQLModel;
 
